@@ -7,7 +7,10 @@ where
 
 import Satchmo.Data
 import qualified Satchmo.Solve
+import Satchmo.Solver.Internal
 
+import qualified Data.ByteString.Char8 as S
+import qualified Data.ByteString.Lazy.Char8 as BS
 import System.Process
 import Control.Monad ( when )
 
@@ -19,10 +22,10 @@ quantor :: Satchmo.Solve.Implementation
 quantor cs = do
     let debug = True
     if debug 
-       then putStrLn cs
-       else putStrLn $ head $ lines cs
+       then BS.putStrLn cs
+       else BS.putStrLn $ head $ BS.lines cs
     ( code, stdout, stderr ) <- 
-        readProcessWithExitCode "quantor" [ "-v", "--resolve-exported=0" ] cs
+        readProcessWithExitCodeBS "quantor" [ "-v", "--resolve-exported=0" ] cs
     when debug $ putStrLn stdout
     let 
     case filter ( \ ws -> take 1 ws /= [ "c" ] ) $ map words $ lines stdout of

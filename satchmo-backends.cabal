@@ -14,11 +14,13 @@ description:	Calls external solvers for (QBF-)CNF-SAT constraints produced by sa
                 minisat (download from http://minisat.se/ )
 		quantor (download from http://fmv.jku.at/quantor/ )
 		qube    (download from http://www.star.dist.unige.it/~qube/ )
-Build-depends: satchmo, process, base, containers
+Build-depends: satchmo >= 1.4.1, process, base >= 4 && < 5, containers, bytestring
 Exposed-modules:
         Satchmo.Solver.Minisat
         Satchmo.Solver.Quantor
         Satchmo.Solver.Qube
+Other-modules:
+        Satchmo.Solver.Internal
 hs-source-dirs:	.
 extensions: 
 build-type: Simple
