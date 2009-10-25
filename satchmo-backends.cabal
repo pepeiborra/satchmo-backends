@@ -19,6 +19,7 @@ Exposed-modules:
         Satchmo.Solver.Minisat
         Satchmo.Solver.Quantor
         Satchmo.Solver.Qube
+        Satchmo.Solver.Yices
 Other-modules:
         Satchmo.Solver.Internal
 hs-source-dirs:	.
