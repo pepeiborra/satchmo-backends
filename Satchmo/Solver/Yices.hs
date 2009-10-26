@@ -42,3 +42,23 @@ yices cs Header{numVars=numVars, numClauses=numClauses} = do
             let l = literal $ abs x
             return ( l, x > 0 )
         _ -> return $ Nothing
+
+yicesW :: Satchmo.Solve.WeightedImplementation
+yicesW cs h = do
+    let header = mkMaxWalkSatDimacsHeader h
+    let debug = False
+    if False
+       then BS.putStrLn cs
+       else hPutStrLn stderr header >> hFlush stdout
+    ( code, stdout, stderr ) <- readProcessWithExitCodeBS "yices" ["-e","-d"] (BS.pack header `mappend` cs)
+    when debug $ hPutStrLn System.IO.stderr stdout
+    when (not $ null stderr) $ putStrLn stderr
+    case lines stdout of
+        "sat" : xs : _ -> return $ Just $ M.fromList $ do
+            x <- map read $ words xs
+            let l = literal $ abs x
+            return ( l, x > 0 )
+        _ -> return $ Nothing
+
+mkMaxWalkSatDimacsHeader Weighted.Header{..}
+  = "p wcnf " ++ show numVars ++ " " ++ show numClauses ++ " " ++ show maxWeight
