@@ -13,3 +13,5 @@ readProcessWithExitCodeBS exec args input = do
         stderr <- hGetContents hErr
         code   <- waitForProcess hProc
         return (code, S.unpack stdout, stderr)
+
+mkDimacsHeader numVars numClauses = "p cnf " ++ show numVars ++ " " ++ show numClauses
