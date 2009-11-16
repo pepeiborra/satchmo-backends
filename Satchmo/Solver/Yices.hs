@@ -30,8 +30,8 @@ yices :: Satchmo.Solve.Implementation
 yices cs Header{numVars=numVars, numClauses=numClauses} = do
     let header = mkDimacsHeader numVars numClauses
     let debug = False
-    if False
-       then BS.putStrLn cs
+    if debug
+       then BS.hPut stderr cs
        else hPutStrLn stderr header >> hFlush stderr
     ( code, stdout, stderr ) <- readProcessWithExitCodeBS "yices" ["-e","-d"] (BS.pack header `mappend` cs)
     when debug $ hPutStrLn System.IO.stderr stdout
@@ -47,8 +47,8 @@ yicesW :: Satchmo.Solve.WeightedImplementation
 yicesW cs h = do
     let header = mkMaxWalkSatDimacsHeader h
     let debug = False
-    if False
-       then BS.putStrLn cs
+    if debug
+       then BS.hPut stderr cs
        else hPutStrLn stderr header >> hFlush stdout
     ( code, stdout, stderr ) <- readProcessWithExitCodeBS "yices" ["-e","-d","-ms"] (BS.pack header `mappend` cs)
     when debug $ hPutStrLn System.IO.stderr stdout
