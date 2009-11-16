@@ -50,7 +50,7 @@ yicesW cs h = do
     if False
        then BS.putStrLn cs
        else hPutStrLn stderr header >> hFlush stdout
-    ( code, stdout, stderr ) <- readProcessWithExitCodeBS "yices" ["-e","-d"] (BS.pack header `mappend` cs)
+    ( code, stdout, stderr ) <- readProcessWithExitCodeBS "yices" ["-e","-d","-ms"] (BS.pack header `mappend` cs)
     when debug $ hPutStrLn System.IO.stderr stdout
     when (not $ null stderr) $ putStrLn stderr
     case lines stdout of
