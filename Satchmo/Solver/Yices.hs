@@ -36,7 +36,7 @@ yices timeout cs Header{numVars=numVars, numClauses=numClauses} = do
        then BS.hPut stderr cs
        else hPutStrLn stderr header >> hFlush stderr
 
-    let opts = ["-e","-d"] ++ maybe [] (\t -> ["--timeout=", show t]) timeout
+    let opts = ["-e","-d"] ++ maybe [] (\t -> ["-tm", show t]) timeout
 
     ( code, stdout, stderr ) <- readProcessWithExitCodeBS "yices" opts (BS.pack header `mappend` cs)
     when debug $ hPutStrLn System.IO.stderr stdout
@@ -56,7 +56,7 @@ yicesW timeout cs h@Weighted.Header{Weighted.maxWeight=maxWeight} = do
        then BS.hPut stderr cs
        else hPutStrLn stderr header >> hFlush stdout
 
-    let opts =  ["-e","-d","-ms", "-mw", show maxWeight] ++ maybe [] (\t -> ["--timeout=", show t]) timeout
+    let opts =  ["-e","-d","-ms", "-mw", show maxWeight] ++ maybe [] (\t -> ["-tm", show t]) timeout
 
     ( code, stdout, stderr ) <- readProcessWithExitCodeBS "yices" opts (BS.pack header `mappend` cs)
     when debug $ hPutStrLn System.IO.stderr stdout
