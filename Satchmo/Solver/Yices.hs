@@ -23,17 +23,22 @@ import Control.Monad ( when )
 
 import qualified Data.Map as M
 
-solve = Satchmo.Solve.solve yices
-solveW maxW = Satchmo.Solve.solveW maxW yicesW
+type Seconds = Int
 
-yices :: Satchmo.Solve.Implementation
-yices cs Header{numVars=numVars, numClauses=numClauses} = do
+solve  timeout = Satchmo.Solve.solve (yices timeout)
+solveW timeout maxW = Satchmo.Solve.solveW maxW (yicesW timeout)
+
+yices :: Maybe Seconds -> Satchmo.Solve.Implementation
+yices timeout cs Header{numVars=numVars, numClauses=numClauses} = do
     let header = mkDimacsHeader numVars numClauses
     let debug = False
     if debug
        then BS.hPut stderr cs
        else hPutStrLn stderr header >> hFlush stderr
-    ( code, stdout, stderr ) <- readProcessWithExitCodeBS "yices" ["-e","-d"] (BS.pack header `mappend` cs)
+
+    let opts = ["-e","-d"] ++ maybe [] (\t -> ["--timeout=", show t]) timeout
+
+    ( code, stdout, stderr ) <- readProcessWithExitCodeBS "yices" opts (BS.pack header `mappend` cs)
     when debug $ hPutStrLn System.IO.stderr stdout
     when (not $ null stderr) $ putStrLn stderr
     case lines stdout of
@@ -43,15 +48,17 @@ yices cs Header{numVars=numVars, numClauses=numClauses} = do
             return ( l, x > 0 )
         _ -> return $ Nothing
 
-yicesW :: Satchmo.Solve.WeightedImplementation
-yicesW cs h@Weighted.Header{Weighted.maxWeight=maxWeight} = do
+yicesW :: Maybe Seconds -> Satchmo.Solve.WeightedImplementation
+yicesW timeout cs h@Weighted.Header{Weighted.maxWeight=maxWeight} = do
     let header = mkMaxWalkSatDimacsHeader h
     let debug = False
     if debug
        then BS.hPut stderr cs
        else hPutStrLn stderr header >> hFlush stdout
-    ( code, stdout, stderr ) <- readProcessWithExitCodeBS "yices" ["-e","-d","-ms", "-mw", show maxWeight]
-                                   (BS.pack header `mappend` cs)
+
+    let opts =  ["-e","-d","-ms", "-mw", show maxWeight] ++ maybe [] (\t -> ["--timeout=", show t]) timeout
+
+    ( code, stdout, stderr ) <- readProcessWithExitCodeBS "yices" opts (BS.pack header `mappend` cs)
     when debug $ hPutStrLn System.IO.stderr stdout
     when (not $ null stderr) $ putStrLn stderr
     case lines stdout of
