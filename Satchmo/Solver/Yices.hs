@@ -1,4 +1,4 @@
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE RecordWildCards, NamedFieldPuns #-}
 
 module Satchmo.Solver.Yices
 
@@ -44,13 +44,14 @@ yices cs Header{numVars=numVars, numClauses=numClauses} = do
         _ -> return $ Nothing
 
 yicesW :: Satchmo.Solve.WeightedImplementation
-yicesW cs h = do
+yicesW cs h@Weighted.Header{Weighted.maxWeight=maxWeight} = do
     let header = mkMaxWalkSatDimacsHeader h
     let debug = False
     if debug
        then BS.hPut stderr cs
        else hPutStrLn stderr header >> hFlush stdout
-    ( code, stdout, stderr ) <- readProcessWithExitCodeBS "yices" ["-e","-d","-ms"] (BS.pack header `mappend` cs)
+    ( code, stdout, stderr ) <- readProcessWithExitCodeBS "yices" ["-e","-d","-ms", "-mw", show maxWeight]
+                                   (BS.pack header `mappend` cs)
     when debug $ hPutStrLn System.IO.stderr stdout
     when (not $ null stderr) $ putStrLn stderr
     case lines stdout of
