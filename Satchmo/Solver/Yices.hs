@@ -1,4 +1,4 @@
-{-# LANGUAGE RecordWildCards, NamedFieldPuns #-}
+{-# LANGUAGE RecordWildCards, NamedFieldPuns, PatternSignatures #-}
 
 module Satchmo.Solver.Yices
 
@@ -43,9 +43,8 @@ yices timeout cs Header{numVars=numVars, numClauses=numClauses} = do
     when (not $ null stderr) $ putStrLn stderr
     case lines stdout of
         "sat" : xs : _ -> return $ Just $ M.fromList $ do
-            x <- map read $ words xs
-            let l = literal $ abs x
-            return ( l, x > 0 )
+            l :: Literal <- map read $ words xs
+            return ( variable l, positive l )
         _ -> return $ Nothing
 
 yicesW :: Maybe Seconds -> Satchmo.Solve.WeightedImplementation
@@ -63,9 +62,8 @@ yicesW timeout cs h@Weighted.Header{Weighted.maxWeight=maxWeight} = do
     when (not $ null stderr) $ putStrLn stderr
     case lines stdout of
         "sat" : xs : _ -> return $ Just $ M.fromList $ do
-            x <- map read $ words xs
-            let l = literal $ abs x
-            return ( l, x > 0 )
+            l <- map read $ words xs
+            return ( variable l, positive l )
         _ -> return $ Nothing
 
 mkMaxWalkSatDimacsHeader Weighted.Header{..}

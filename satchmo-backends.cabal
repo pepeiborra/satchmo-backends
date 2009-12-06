@@ -1,5 +1,5 @@
 Name:           satchmo-backends
-Version:        1.5
+Version:        1.6.0
 
 License:        GPL
 License-file:	gpl-2.0.txt
@@ -14,7 +14,7 @@ description:	Calls external solvers for (QBF-)CNF-SAT constraints produced by sa
                 minisat (download from http://minisat.se/ )
 		quantor (download from http://fmv.jku.at/quantor/ )
 		qube    (download from http://www.star.dist.unige.it/~qube/ )
-Build-depends: satchmo >= 1.4.1, process, base >= 4 && < 5, containers, bytestring
+Build-depends: satchmo == 1.6.*, process, base >= 4 && < 5, containers, bytestring
 Exposed-modules:
         Satchmo.Solver.Minisat
         Satchmo.Solver.Quantor

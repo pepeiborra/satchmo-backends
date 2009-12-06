@@ -37,8 +37,7 @@ qube cs Header{numVars=numVars, numClauses=numClauses} = do
         [ "s", "cnf", "1" ] : rest -> 
             return $ Just $ M.fromList $ do
                 "v" : vars <- rest
-                x <- takeWhile ( /= 0 ) $ map read vars
-                let l = literal $ abs x
-                return ( l, x > 0 )
+                l <- map read $ takeWhile ( /= "0" ) vars
+                return ( variable l, positive l )
         _ -> return $ Nothing
 
